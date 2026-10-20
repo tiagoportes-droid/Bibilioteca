@@ -1,4 +1,4 @@
-import mysql from "mysql";
+import mysql from "mysql2/promise";
 
 const abrirConexao = () => {
   return mysql.createPool({
