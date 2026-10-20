@@ -1,21 +1,53 @@
 import express from "express";
 import cors from "cors";
-import mysql from "mysql";
-import "dotenv/config";// pegando as informações do arquivo .env
+import abrirConexao from "./db.js";
+import "dotenv/config"; // pegando as informações do arquivo .env
 
 const app = express();
 
 app.use(express.json());
-app.use(express.static('./'))
+app.use(express.static("./"));
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+app.get("/", (req, res) => {
+  res.sendFile("index.html", { root: "./public" }); // manda para o usuario um arquivo de resposta
 });
 
-const PORT = 3000;
+app.get("/livros", async (req, res) => {
+  const sql = "SELECT * FROM livro";
+  const [resp] = await conexao.query(sql);
+  res.json(resp);
+});
+
+app.post("/cadastro", async (req, res) => {
+  const { titulo, descricao, autor } = req.body;
+
+  if (!titulo || !descricao || !autor) {
+    return res.status(400).json({ msg: "O campo do livro é obrigatorio" });
+  }
+
+  let com;
+  try {
+    com = await abrirConexao().getConnection();
+    const result = await com.query(
+      "INSERT INTO lirvo (titulo, descricao, autor) VALUES (?)",
+      [titulo, descricao, autor],
+    );
+    res.status(201).json({
+      msg: "Produto Adicionado com sucesso",
+      msgId: Number(result.insertId),
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "Erro interno no servidor" });
+  } finally {
+    if (com) com.release();
+  }
+});
+
+const conexao = abrirConexao();
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
