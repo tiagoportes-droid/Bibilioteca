@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +15,12 @@
   "dependencies": {
     "cors": "^2.8.6",
     "denv": "^1.0.4",
+    "dotenv": "^18.0.8",
     "express": "^5.3.0",
+    "mariadb": "^3.5.4",
     "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
